@@ -5,7 +5,7 @@ const productSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    image: {
+    imgURl: {
         data: Buffer,
         contentType: String
     },

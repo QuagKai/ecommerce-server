@@ -6,6 +6,10 @@ const categorySchema = new mongoose.Schema({
         type: String,
         require: true
     },
+    imgURL: {
+        data: Buffer,
+        contentType: String
+    },
     items: [
         {
             type: [Schema.Type.ObjectID],
