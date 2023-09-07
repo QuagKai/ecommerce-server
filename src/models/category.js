@@ -10,10 +10,19 @@ const categorySchema = new mongoose.Schema({
         data: Buffer,
         contentType: String
     },
+    attCate:{
+        type: String,
+        default: ''
+    },
     items: [
         {
-            type: [Schema.Type.ObjectID],
+            type: Schema.Type.ObjectID,
             ref: 'Products'
+        }
+    ],
+    subCate: [
+        {
+            type: Schema.Type.ObjectID,
         }
     ]
 })

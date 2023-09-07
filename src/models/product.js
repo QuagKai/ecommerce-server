@@ -10,22 +10,25 @@ const productSchema = new mongoose.Schema({
         contentType: String
     },
     descrip: {
-        script1: {
-            type: String,
-            require: true
-        },
-        script2: {
-            type: String,
-        }
+        type: String,
+        require: true
+    },
+    brand: {
+        type: String,
+        required: true
+    },
+    date: {
+        type: Date,
+        default: Date.now()
     },
     cost: {
         type: Number,
         required: true,
         min: 0,
     },
-    brand: {
+    category_att: {
         type: String,
-        required: true
+        default: '',
     }
 });
 
