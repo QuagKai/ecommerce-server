@@ -6,9 +6,17 @@ const categorySchema = new mongoose.Schema({
         type: String,
         require: true
     },
+    imgURL: {
+        data: Buffer,
+        contentType: String
+    },
+    attCate:{
+        type: String,
+        default: []
+    },
     items: [
         {
-            type: [Schema.Type.ObjectID],
+            type: Schema.Type.ObjectID,
             ref: 'Products'
         }
     ]
