@@ -1,5 +1,6 @@
 const { customerRegister, customerLogin } = require('./src/controller/customerController')
 const { sellerRegister, sellerLogin } = require('./src/controller/sellerController')
+const { searchProduct} = require('./src/controller/productController')
 
 const express = require('express');
 const { showAllProducts } = require('./src/controller/productController')
@@ -45,6 +46,12 @@ router.post('/login/customer', async (req, res) => {
 
     res.send(response);
 })
+
+router.post('/search', async (req, res) => {
+  const response = await searchProduct(req);
+
+  res.send(response);
+})
 //
 
 //Route for seller
@@ -59,6 +66,7 @@ router.post('/login/seller', async (req, res) => {
 
     res.send(response);
 })
+
 
 
 module.exports = router
