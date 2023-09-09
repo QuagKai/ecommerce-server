@@ -22,7 +22,6 @@ const showAProduct = async(req, res, next) => {
 }
 
 const createProduct = async(req, res, next) => {
-    findAttriCategory
     await Product.create(req.body)
     .then(() => console.log("Created product successfully"))
     .catch((err) => {
