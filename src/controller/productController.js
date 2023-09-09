@@ -71,3 +71,19 @@ const deleteProduct = async(req, res, next) => {
 }
 
 module.exports = { showAllProducts, showAProduct, createProduct, updateProduct, deleteProduct }
+=======
+const searchProduct = async (request) => {
+    const search = request.body.search
+    
+    const results = await Product.find({
+        $or: [
+          { name: { $regex: search, $options: 'i' } }, // Case-insensitive search in 'name' field
+          { description: { $regex: search, $options: 'i' } }, // Case-insensitive search in 'description' field
+        ],
+      });
+
+    return results
+}
+
+module.exports = { showAllProducts, searchProduct }
+

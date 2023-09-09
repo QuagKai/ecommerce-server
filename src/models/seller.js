@@ -11,7 +11,7 @@ const sellerSchema = new mongoose.Schema({
         required: true,
         unique: true,
     },
-    businessname: {
+    businessName: {
         type: String,
         required: true,
         minlength: 6
@@ -19,8 +19,6 @@ const sellerSchema = new mongoose.Schema({
     password: {
         type: String,
         required: true,
-        minlength: 8,
-        maxlength: 24,
     },
     status: {
         type: String,
@@ -28,4 +26,4 @@ const sellerSchema = new mongoose.Schema({
     }
 });
 
-module.exports = mongoose.model('Sellers', userSchema)
+module.exports = mongoose.model('Sellers', sellerSchema)
