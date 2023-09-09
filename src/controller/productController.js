@@ -70,7 +70,6 @@ const deleteProduct = async(req, res, next) => {
 }
 
 module.exports = { showAllProducts, showAProduct, createProduct, updateProduct, deleteProduct }
-=======
 const searchProduct = async (request) => {
     const search = request.body.search
     
