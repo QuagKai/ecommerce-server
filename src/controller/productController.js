@@ -1,4 +1,5 @@
-const Product = require('../models/product')
+const Product = require('../models/product');
+const { findAttriCategory } = require('./categoryController');
 
 const showAllProducts = async(req, res, next) => {
     await Product.find()
@@ -21,6 +22,7 @@ const showAProduct = async(req, res, next) => {
 }
 
 const createProduct = async(req, res, next) => {
+    findAttriCategory
     await Product.create(req.body)
     .then(() => console.log("Created product successfully"))
     .catch((err) => {
@@ -37,7 +39,7 @@ const createProduct = async(req, res, next) => {
 }
 
 const updateProduct = async(req, res, next) => {
-    await Product.findByIdAndUpdate(req.body._id)
+    await Product.findByIdAndUpdate(req.params.id)
     .then(() => console.log("Update Successfully"))
     .catch((err) => {
         console.log("Failed to update")
@@ -53,7 +55,7 @@ const updateProduct = async(req, res, next) => {
 }
 
 const deleteProduct = async(req, res, next) => {
-    await Product.findByIdAndDelete(req.body._id)
+    await Product.findByIdAndDelete(req.params.id)
     .then(() => console.log("Successfully delete"))
     .catch((err) => {
         console.log("Failed to delete")

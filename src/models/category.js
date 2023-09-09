@@ -12,17 +12,12 @@ const categorySchema = new mongoose.Schema({
     },
     attCate:{
         type: String,
-        default: ''
+        default: []
     },
     items: [
         {
             type: Schema.Type.ObjectID,
             ref: 'Products'
-        }
-    ],
-    subCate: [
-        {
-            type: Schema.Type.ObjectID,
         }
     ]
 })
