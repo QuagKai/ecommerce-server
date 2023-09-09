@@ -28,7 +28,7 @@ const productSchema = new mongoose.Schema({
     },
     category_att: {
         type: String,
-        default: '',
+        default: [],
     }
 });
 
