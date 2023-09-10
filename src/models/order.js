@@ -1,10 +1,16 @@
 const mongoose = require('mongoose');
 const Carts = require('./cart');
+const Products = require('./product');
+const Customers = require('./customer');
 
 const orderSchema = new mongoose.Schema({
-    cart: {
-        type: Schema.Type.ObjectID,
-        ref: 'Carts'
+    customerId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Customers',
+        },
+    product: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Products',
     },
     address: {
         type: String,
