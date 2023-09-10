@@ -47,6 +47,7 @@ router.get('/manager/product/update?id=$id', updateProduct, (req, res) => {
 
 router.get('/manager/product/delete?id=$id', deleteProduct, (req, res) => {
     console.log("deleteProduct route end");
+})
 
 router.get('/homepage', (req, res) => {
     res.send('This is a homepage')
