@@ -3,7 +3,7 @@ const Carts = require('./cart');
 
 const orderSchema = new mongoose.Schema({
     cart: {
-        type: Schema.Type.ObjectID,
+        type: mongoose.Schema.Types.ObjectId,
         ref: 'Carts'
     },
     address: {
