@@ -3,19 +3,23 @@ const Products = require('./product');
 
 const cartSchema = new mongoose.Schema({
   cartOwner: {
-    type: Schema.Types.ObjectId,
+    type: mongoose.Schema.Types.ObjectId,
     ref: 'Customers',
     required: true,
   },
   items: [
     {
-      type: [Schema.Type.ObjectID],
-      ref: 'Products'
+      product: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Products'
+      },
+      quantity: {
+        type: Number,
+      }
     }
   ],
   qty: {
     type: Number,
-    default: 1,
   },
   totalCost: {
     type: Number,

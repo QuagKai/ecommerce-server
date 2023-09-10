@@ -22,7 +22,6 @@ const showAProduct = async(req, res, next) => {
 }
 
 const createProduct = async(req, res, next) => {
-    findAttriCategory
     await Product.create(req.body)
     .then(() => console.log("Created product successfully"))
     .catch((err) => {
@@ -71,7 +70,6 @@ const deleteProduct = async(req, res, next) => {
 }
 
 module.exports = { showAllProducts, showAProduct, createProduct, updateProduct, deleteProduct }
-=======
 const searchProduct = async (request) => {
     const search = request.body.search
     
