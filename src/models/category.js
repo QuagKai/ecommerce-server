@@ -14,12 +14,6 @@ const categorySchema = new mongoose.Schema({
         type: String,
         default: []
     },
-    items: [
-        {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'Products'
-        }
-    ]
 })
 
 module.exports = mongoose.model('Categories', categorySchema);

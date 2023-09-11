@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken');
 
 const express = require('express');
 const { showAllProducts, showAProduct, createProduct, updateProduct, deleteProduct } = require('./src/controller/productController');
-const { findAttriCategory } = require('./src/controller/categoryController');
+const { findAttriCategory, loadAllCategories } = require('./src/controller/categoryController');
 const router = express.Router();
 router.use(express.json());
 
@@ -118,6 +118,23 @@ router.get('/me', verifyToken, (req, res) => {
   res.json({ message: 'Access granted', userId });
 });
 
+//get id
+router.get('/me', verifyToken, (req, res) => {
+  const userId = req.user.userId;
+  
+  res.json({ message: 'Access granted', userId });
+});
 
+router.get('/browsing/all', showAllProducts, (req, res) => {
+    console.log("browsing all route end")
+})
+
+router.all('/browsing/category', loadAllCategories, (req, res) => {
+    console.log("loadingAllCategories route end")
+})
+
+router.get('/browsing/product/:id', showAProduct, (req, res) => {
+    console.log("browsing a product route end")
+})
 
 module.exports = router

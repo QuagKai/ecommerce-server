@@ -3,15 +3,26 @@ const Carts = require('./cart');
 const Products = require('./product');
 const Customers = require('./customer');
 
-const orderSchema = new mongoose.Schema({
-    customerId: {
+const orderSchema = new mongoose.Schema({    
+    created_by: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Customers',
-        },
-    product: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Products',
+        ref: 'Customers'
     },
+    sellerId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Sellers'
+    },
+    items: [
+        {
+          product: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Products'
+          },
+          quantity: {
+            type: Number,
+          }
+        }
+      ],
     address: {
         type: String,
         require: true

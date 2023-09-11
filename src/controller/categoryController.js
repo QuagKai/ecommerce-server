@@ -12,4 +12,28 @@ const findAttriCategory = async (req, res, next) => {
     next()
 }
 
-module.exports = { findAttriCategory }
+const loadAllCategories = async (req, res, next) => {
+    await Category.find()
+    .then((allCat) => {
+        res.json(allCat)
+    })
+    .catch((err) => {
+        console.log("Error in find all categories")
+        throw err
+    })
+    next();
+}
+
+const findProductOfCategory = async(req, res, next) => {
+    await Category.find({name: req.params.name}). populate('items')
+    .then((allCat) => {
+        res.json(allCat)
+    })
+    .catch((err) => {
+        console.log("Error in find all categories")
+        throw err
+    })
+    next();
+}
+
+module.exports = { findAttriCategory, loadAllCategories }
