@@ -1,6 +1,7 @@
 const { customerRegister, customerLogin } = require('./src/controller/customerController')
 const { sellerRegister, sellerLogin } = require('./src/controller/sellerController')
 const { searchProduct} = require('./src/controller/productController')
+const jwt = require('jsonwebtoken');
 
 const express = require('express');
 const { showAllProducts, showAProduct, createProduct, updateProduct, deleteProduct } = require('./src/controller/productController');
@@ -8,55 +9,94 @@ const { findAttriCategory, loadAllCategories } = require('./src/controller/categ
 const router = express.Router();
 router.use(express.json());
 
-//authenticator middleware
-function authenticateToken(req, res, next) {
-    const token = req.header('Authorization'); // You may send the token in the 'Authorization' header
+function verifyToken(req, res, next) {
+  const token = req.headers.authorization;
+  const secretKey = process.env.SECRET_KEY;
   
-    if (!token) {
-      return res.status(401).json({ message: 'Access denied: No token provided' });
-    }
-  
-    jwt.verify(token, secretKey, (err, user) => {
-      if (err) {
-        return res.status(403).json({ message: 'Invalid token' });
-      }
-  
-      // Token is valid; you can access the user information (e.g., user.userId)
-      req.user = user;
-      next();
-    });
+
+  if (!token) {
+    return res.status(401).json({ message: 'Token not provided' });
   }
 
+  jwt.verify(token, secretKey, (err, decoded) => {
+    if (err) {
+      return res.status(401).json({ message: 'Invalid token' });
+    }
+
+    // Store the user object in the request
+    req.user = decoded;
+    next();
+  });
+}
 
 router.get('/homepage', (req, res) => {
     res.send('This is a homepage');
 })
 
 //All routes for product management
-router.get('/manager/product/showAllProducts', showAllProducts, (req, res) => {
-    console.log('showAllProduct route end');
+router.post('/product', async (req, res) => {
+    const response = await showAllProducts(req);
+
+    res.json(response);
 })
 
-router.get('/manager/product/create?category=$name', createProduct, findAttriCategory, (req, res) => {
-    console.log('createProduct route end');
+router.post('/upload', async (req, res) => {
+  console.log(req)
+    const response = await createProduct(req);
+
+    res.json(response);
 })
 
-router.get('/manager/product/update?id=$id', updateProduct, (req, res) => {
-    console.log("updateProduct route end");
+app.use('/images', express.static(path.join(__dirname, 'images')));
+
+router.post('/update-product', async (req, res) => {
+    const response = await updateProduct(req);
+
+    res.json(response);
 })
 
-router.get('/manager/product/delete?id=$id', deleteProduct, (req, res) => {
-    console.log("deleteProduct route end");
+app.get('/display/:filename', (req, res) => {
+  const filename = req.params.filename;
+  const filePath = path.join(__dirname, 'public', filename);
+
+  fs.readFile(filePath, (err, data) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).send('Error reading the file');
+    }
+
+    // Assuming the file is an image, set the appropriate content type
+    res.setHeader('Content-Type', 'image/jpeg'); // Adjust content type as needed
+    res.send(data);
+  });
+});
+
+router.delete('/product', async (req, res) => {
+    const response = await deleteProduct(req);
+
+    res.json(response);
 })
 
-router.get('/homepage', (req, res) => {
-    res.send('This is a homepage')
-})
+// router.get('/manager/product/create?category=$name', createProduct, findAttriCategory, (req, res) => {
+//     console.log('createProduct route end');
+// })
 
-router.get('/manager/showAllProducts', showAllProducts, (req, res) => {
-    console.log('showProduct route end');
+// router.get('/manager/product/update?id=$id', updateProduct, (req, res) => {
+//     console.log("updateProduct route end");
+// })
 
-})
+// router.get('/manager/product/delete?id=$id', deleteProduct, (req, res) => {
+//     console.log("deleteProduct route end");
+// })
+
+// router.get('/homepage', (req, res) => {
+//     res.send('This is a homepage')
+// })
+
+// router.get('/manager/showAllProducts', showAllProducts, (req, res) => {
+//     console.log('showProduct route end');
+
+// })
 
 //Route for customer
 router.put('/customer', async (req, res) => {
@@ -91,16 +131,23 @@ router.post('/login/seller', async (req, res) => {
     res.send(response);
 })
 
-router.get('/browsing/all', showAllProducts, (req, res) => {
-    console.log("browsing all route end")
-})
+//get id
+router.get('/me', verifyToken, (req, res) => {
+  const userId = req.user.userId;
+  
+  res.json({ message: 'Access granted', userId });
+});
 
-router.all('/browsing/category', loadAllCategories, (req, res) => {
-    console.log("loadingAllCategories route end")
-})
+// router.get('/browsing/all', showAllProducts, (req, res) => {
+//     console.log("browsing all route end")
+// })
 
-router.get('/browsing/product/:id', showAProduct, (req, res) => {
-    console.log("browsing a product route end")
-})
+// router.all('/browsing/category', loadAllCategories, (req, res) => {
+//     console.log("loadingAllCategories route end")
+// })
+
+// router.get('/browsing/product/:id', showAProduct, (req, res) => {
+//     console.log("browsing a product route end")
+// })
 
 module.exports = router

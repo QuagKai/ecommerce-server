@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const Seller = require('./seller');
 
 const productSchema = new mongoose.Schema({
     sellerId: {
@@ -14,8 +15,8 @@ const productSchema = new mongoose.Schema({
         required: true,
     },
     imgURl: {
-        data: Buffer,
-        contentType: String
+        type: String,
+        required: true,
     },
     descrip: {
         type: String,
