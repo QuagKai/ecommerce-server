@@ -12,6 +12,7 @@ router.use(express.json());
 function verifyToken(req, res, next) {
   const token = req.headers.authorization;
   const secretKey = process.env.SECRET_KEY;
+  
 
   if (!token) {
     return res.status(401).json({ message: 'Token not provided' });
@@ -33,23 +34,42 @@ router.get('/homepage', (req, res) => {
 })
 
 //All routes for product management
-router.get('/product', async (req, res) => {
+router.post('/product', async (req, res) => {
     const response = await showAllProducts(req);
 
     res.json(response);
 })
 
-router.post('/product', async (req, res) => {
+router.post('/upload', async (req, res) => {
+  console.log(req)
     const response = await createProduct(req);
 
     res.json(response);
 })
+
+app.use('/images', express.static(path.join(__dirname, 'images')));
 
 router.post('/update-product', async (req, res) => {
     const response = await updateProduct(req);
 
     res.json(response);
 })
+
+app.get('/display/:filename', (req, res) => {
+  const filename = req.params.filename;
+  const filePath = path.join(__dirname, 'public', filename);
+
+  fs.readFile(filePath, (err, data) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).send('Error reading the file');
+    }
+
+    // Assuming the file is an image, set the appropriate content type
+    res.setHeader('Content-Type', 'image/jpeg'); // Adjust content type as needed
+    res.send(data);
+  });
+});
 
 router.delete('/product', async (req, res) => {
     const response = await deleteProduct(req);
@@ -118,23 +138,16 @@ router.get('/me', verifyToken, (req, res) => {
   res.json({ message: 'Access granted', userId });
 });
 
-//get id
-router.get('/me', verifyToken, (req, res) => {
-  const userId = req.user.userId;
-  
-  res.json({ message: 'Access granted', userId });
-});
+// router.get('/browsing/all', showAllProducts, (req, res) => {
+//     console.log("browsing all route end")
+// })
 
-router.get('/browsing/all', showAllProducts, (req, res) => {
-    console.log("browsing all route end")
-})
+// router.all('/browsing/category', loadAllCategories, (req, res) => {
+//     console.log("loadingAllCategories route end")
+// })
 
-router.all('/browsing/category', loadAllCategories, (req, res) => {
-    console.log("loadingAllCategories route end")
-})
-
-router.get('/browsing/product/:id', showAProduct, (req, res) => {
-    console.log("browsing a product route end")
-})
+// router.get('/browsing/product/:id', showAProduct, (req, res) => {
+//     console.log("browsing a product route end")
+// })
 
 module.exports = router

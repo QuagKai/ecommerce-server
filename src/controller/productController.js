@@ -1,9 +1,11 @@
 const Product = require('../models/product');
 const { findAttriCategory } = require('./categoryController');
+const path = require('path');
+const fs = require('fs');
 
 const sampleProducts = [
     {
-      sellerId: '609c0e964b0ee32bcc29f31a',
+      sellerId: '64fd38efa592ed3f1c3468ae',
       name: 'Product 1',
       imgURl: {
         data: Buffer.from('Sample Image Data 1'),
@@ -49,7 +51,8 @@ const sampleProducts = [
 
 const showAllProducts = async(req, res, next) => {
    try {
-       const products = await Product.find();
+        const id = req.body.userId;
+        const products = await Product.find({ sellerId: id });
 
        return products;
    } catch (error) {
@@ -72,30 +75,46 @@ const showAProduct = async(req, res, next) => {
 }
 
 const createProduct = async(req, res, next) => {
-    try {
-        const { name, imgURl, descrip, brand, cost, category_att } = req.body;
+  const uploadedFile = req.files.image;
+  const { name, descrip, brand, cost, category_att } = req.body;
 
-        const product = new Product({
-            name,
-            imgURl,
-            descrip,
-            brand,
-            cost,
-            category_att
-        });
-        product.save();
-        return [{ message: "Create successfully!" }, { status: 200 }];
-    } catch (error) {
-        console.log(error);
-        return [{ message: error }];
+  const randomName = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+  const filename = randomName + path.extname(uploadedFile.name);
+
+  const uploadDirectory = path.join(__dirname, '../image'); 
+
+  if (!fs.existsSync(uploadDirectory)) {
+    fs.mkdirSync(uploadDirectory, { recursive: true });
+  }
+
+  const filePath = path.join(uploadDirectory, filename);
+  uploadedFile.mv(filePath, (err) => {
+    if (err) {
+      console.error('Error moving file:', err);
+      return { error: 'An error occurred while moving the file.' }
     }
+
+   return { message: 'File uploaded and stored successfully!' };
+  });
+
+  const product = new Product({
+    sellerId: req.body.userId,
+    name,
+    imgURl: filePath,
+    descrip,
+    brand,
+    cost,
+    category_att,
+  });
+
+  await product.save();
 }
 
 const updateProduct = async(req, res, next) => {
     try {
         const { _id, name, imgURl, descrip, brand, cost, category_att } = req.body;
 
-        Product.findByIdAndUpdate(_id, {
+       await Product.findByIdAndUpdate(_id, {
             name,
             imgURl,
             descrip,
@@ -135,5 +154,5 @@ const searchProduct = async (request) => {
     return results
 }
 
-module.exports = { showAllProducts, searchProduct, updateProduct, deleteProduct }
+module.exports = { showAllProducts, searchProduct, updateProduct, deleteProduct, createProduct }
 

@@ -15,8 +15,8 @@ const productSchema = new mongoose.Schema({
         required: true,
     },
     imgURl: {
-        data: Buffer,
-        contentType: String
+        type: String,
+        required: true,
     },
     descrip: {
         type: String,
