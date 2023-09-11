@@ -69,7 +69,6 @@ const deleteProduct = async(req, res, next) => {
     next()
 }
 
-module.exports = { showAllProducts, showAProduct, createProduct, updateProduct, deleteProduct }
 const searchProduct = async (request) => {
     const search = request.body.search
     
@@ -83,5 +82,4 @@ const searchProduct = async (request) => {
     return results
 }
 
-module.exports = { showAllProducts, searchProduct }
-
+module.exports = { showAllProducts, showAProduct, createProduct, updateProduct, deleteProduct, searchProduct }
