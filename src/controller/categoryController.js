@@ -1,4 +1,33 @@
 const Category = require('../models/category');
+//create category sample data
+
+const sampleCategories = [
+    {
+        name: 'Category 1',
+        imgURL: 'a9g2wzp5enkeol2id2pzl.png',
+        attCate: 'Attribute 1',
+    },
+    {
+        name: 'Category 2',
+        imgURL: 'a9g2wzp5enkeol2id2pzl.png',
+        attCate: 'Attribute 2',
+    },
+    // Add more sample categories as needed
+];
+
+const insertSampleCategories = async () => {
+    await Category.insertMany(sampleCategories);
+
+    console.log('Sample categories inserted');
+};
+
+insertSampleCategories();
+
+const getCategories = async (req, res, next) => {
+    const response = await Category.find()
+
+    return response;
+}
 
 const findAttriCategory = async (req, res, next) => {
     await Category.findOne({name: req.params.name})
@@ -36,4 +65,4 @@ const findProductOfCategory = async(req, res, next) => {
     next();
 }
 
-module.exports = { findAttriCategory, loadAllCategories }
+module.exports = { findAttriCategory, loadAllCategories, getCategories }
