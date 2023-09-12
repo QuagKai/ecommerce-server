@@ -4,7 +4,7 @@ const { searchProduct} = require('./src/controller/productController')
 const jwt = require('jsonwebtoken');
 
 const express = require('express');
-const { showAllProducts, showAProduct, addToCart, createProduct, updateProduct, deleteProduct } = require('./src/controller/productController');
+const { showAllProducts, showAProduct, createProduct, updateProduct, deleteProduct } = require('./src/controller/productController');
 const { findAttriCategory, loadAllCategories } = require('./src/controller/categoryController');
 const router = express.Router();
 router.use(express.json());
@@ -113,12 +113,6 @@ router.post('/login/seller', async (req, res) => {
     res.send(response);
 })
 
-router.get('/browsing/all', async (req, res) => {
-    const response = await showAllProducts();
-    res.send(response);
-    console.log("browsing all route end")
-})
-
 //get id
 router.get('/me', verifyToken, (req, res) => {
   const userId = req.user.userId;
@@ -126,23 +120,18 @@ router.get('/me', verifyToken, (req, res) => {
   res.json({ message: 'Access granted', userId });
 });
 
-router.get('/browsing/product/:id', async (req, res) => {
-    const response = await showAProduct(req.params.id);
-    res.send(response);
-    console.log("browsing a product route end")
-})
+// router.get('/browsing/all', showAllProducts, (req, res) => {
+//     console.log("browsing all route end")
+// })
 
 // router.all('/browsing/category', loadAllCategories, (req, res) => {
 //     console.log("loadingAllCategories route end")
 // })
 
-router.use('/images', express.static('./src/image'));
+// router.get('/browsing/product/:id', showAProduct, (req, res) => {
+//     console.log("browsing a product route end")
+// })
 
-router.post('/browsing/product/:id/addToCart/:userId', async (req, res) => {
-    const {id, userId} = req.params
-    const response = await addToCart(id, userId)
-    console.log(response);
-    console.log("addToCart route end")
-})
+router.use('/images', express.static('./src/image'));
 
 module.exports = router

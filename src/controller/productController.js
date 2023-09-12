@@ -1,5 +1,4 @@
 const Product = require('../models/product');
-const Carts = require('../models/cart');
 const { findAttriCategory } = require('./categoryController');
 const path = require('path');
 const fs = require('fs');
@@ -50,13 +49,6 @@ const sampleProducts = [
   // Call the function to insert the sample products
   insertSampleProducts();
 
-const showAllProducts = () => {
-    return Product.find()
-    .then((p) => {
-        return p
-    })
-    .catch((err)=> console.log('Find in products colletion failed'))
-  
 const showAllProducts = async(req, res, next) => {
    try {
         const id = req.body.userId;
@@ -69,44 +61,17 @@ const showAllProducts = async(req, res, next) => {
     }
 }
 
-const showAProduct = async(id) => {
-    return Product.findById(id)
+const showAProduct = async(req, res, next) => {
+    await Product.findById(req.params.id)
     .then((p) => {
         console.log("Found a product");
-        return p
+        res.json(p)
     })
     .catch((err) => {
         console.log("Failed to update");
         throw err
     })
-}
-
-const addToCart =  async(pid, cid) => {
-    return await Carts.findOne({cartOwner: cid})
-    .then(async (cart) => {
-        if (cart && cart.items.length > 0) {
-            let dup = false;
-            for (let i = 0; i < cart.items.length; i++) {
-                if (cart.items[i].product == pid) {
-                    cart.items[i].quantity += 1
-                    dup = true
-                    console.log("Increase quantity by one")
-                    break
-                } 
-            }
-            if (dup == false) {
-                cart.items.push({product: pid, quantity: 1})
-                console.log("New item is pushed in existed cart")
-            }
-        } else {
-            await Carts.create({cartOwner: cid})
-            .then((cart) => {
-                cart.items.push({product: pid, quantity: 1})
-            })
-            .catch((err) => console.log("Cannot create a create and pust items: " + err))
-        }
-    })
-    .catch((err) => console.log("addToCart function error: " + err))
+    next()
 }
 
 const createProduct = async(req, res, next) => {
@@ -188,5 +153,5 @@ const searchProduct = async (request) => {
     return results
 }
 
-module.exports = { showAllProducts, showAProduct, addToCart, createProduct, updateProduct, deleteProduct, searchProduct }
+module.exports = { showAllProducts, searchProduct, updateProduct, deleteProduct, createProduct }
 
