@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
 const Carts = require('./cart');
+const Products = require('./product');
+const Customers = require('./customer');
 
 const orderSchema = new mongoose.Schema({    
     created_by: {
