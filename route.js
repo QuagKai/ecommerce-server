@@ -3,7 +3,7 @@ const { sellerRegister, sellerLogin } = require('./src/controller/sellerControll
 const { searchProduct} = require('./src/controller/productController')
 
 const express = require('express');
-const { showAllProducts, showAProduct, createProduct, updateProduct, deleteProduct } = require('./src/controller/productController');
+const { showAllProducts, showAProduct, addToCart, createProduct, updateProduct, deleteProduct } = require('./src/controller/productController');
 const { findAttriCategory, loadAllCategories } = require('./src/controller/categoryController');
 const router = express.Router();
 router.use(express.json());
@@ -91,7 +91,9 @@ router.post('/login/seller', async (req, res) => {
     res.send(response);
 })
 
-router.get('/browsing/all', showAllProducts, (req, res) => {
+router.get('/browsing/all', async (req, res) => {
+    const response = await showAllProducts();
+    res.send(response);
     console.log("browsing all route end")
 })
 
@@ -99,8 +101,17 @@ router.all('/browsing/category', loadAllCategories, (req, res) => {
     console.log("loadingAllCategories route end")
 })
 
-router.get('/browsing/product/:id', showAProduct, (req, res) => {
+router.get('/browsing/product/:id', async (req, res) => {
+    const response = await showAProduct(req.params.id);
+    res.send(response);
     console.log("browsing a product route end")
+})
+
+router.post('/browsing/product/:id/addToCart/:userId', async (req, res) => {
+    const {id, userId} = req.params
+    const response = await addToCart(id, userId)
+    console.log(response);
+    console.log("addToCart route end")
 })
 
 module.exports = router
