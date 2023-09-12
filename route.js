@@ -4,11 +4,9 @@ const { searchProduct} = require('./src/controller/productController')
 const jwt = require('jsonwebtoken');
 
 const express = require('express');
-const { showSellerProducts, showAProduct, createProduct, updateProduct, deleteProduct } = require('./src/controller/productController');
-const { findAttriCategory, loadAllCategories, getCategories } = require('./src/controller/categoryController');
 const { showSellerOrder, setSellerOrderStatus } = require('./src/controller/orderController');
-const { showAllProducts, showAProduct, addToCart, createProduct, updateProduct, deleteProduct } = require('./src/controller/productController');
-const { findAttriCategory, loadAllCategories } = require('./src/controller/categoryController');
+const { showSellerProducts, showAllProducts, showAProduct, addToCart, createProduct, updateProduct, deleteProduct } = require('./src/controller/productController');
+const { findAttriCategory, loadAllCategories, getCategories } = require('./src/controller/categoryController');
 const router = express.Router();
 
 router.use(express.json());
@@ -136,6 +134,7 @@ router.delete('/seller/product', async (req, res) => {
   const response = await deleteProduct(req);
 
   res.json(response);
+})
 
 router.get('/browsing/all', async (req, res) => {
     const response = await showAllProducts();
