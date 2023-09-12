@@ -1,4 +1,5 @@
 const Product = require('../models/product');
+const Carts = require('../models/cart');
 const { findAttriCategory } = require('./categoryController');
 const path = require('path');
 const fs = require('fs');
@@ -36,7 +37,7 @@ const sampleProducts = [
 
 
 const showSellerProducts = async(req, res, next) => {
-   try {
+    try {
         const id = req.body.userId;
         const products = await Product.find({ sellerId: id });
 
@@ -46,18 +47,53 @@ const showSellerProducts = async(req, res, next) => {
          throw error
     }
 }
+const showAllProducts = () => {
+    return Product.find()
+    .then((p) => {
+        return p
+    })
+    .catch((err)=> console.log('Find in products colletion failed'))
+  
+}
 
-const showAProduct = async(req, res, next) => {
-    await Product.findById(req.params.id)
+const showAProduct = async(id) => {
+    return Product.findById(id)
     .then((p) => {
         console.log("Found a product");
-        res.json(p)
+        return p
     })
     .catch((err) => {
         console.log("Failed to update");
         throw err
     })
-    next()
+}
+
+const addToCart =  async(pid, cid) => {
+    return await Carts.findOne({cartOwner: cid})
+    .then(async (cart) => {
+        if (cart && cart.items.length > 0) {
+            let dup = false;
+            for (let i = 0; i < cart.items.length; i++) {
+                if (cart.items[i].product == pid) {
+                    cart.items[i].quantity += 1
+                    dup = true
+                    console.log("Increase quantity by one")
+                    break
+                } 
+            }
+            if (dup == false) {
+                cart.items.push({product: pid, quantity: 1})
+                console.log("New item is pushed in existed cart")
+            }
+        } else {
+            await Carts.create({cartOwner: cid})
+            .then((cart) => {
+                cart.items.push({product: pid, quantity: 1})
+            })
+            .catch((err) => console.log("Cannot create a create and pust items: " + err))
+        }
+    })
+    .catch((err) => console.log("addToCart function error: " + err))
 }
 
 const createProduct = async(req, res, next) => {
@@ -134,5 +170,6 @@ const searchProduct = async (request) => {
     return results
 }
 
-module.exports = { showSellerProducts, searchProduct, updateProduct, deleteProduct, createProduct }
+module.exports = { showSellerProducts,showAllProducts, showAProduct, 
+                  addToCart, createProduct, updateProduct, deleteProduct, searchProduct }
 
