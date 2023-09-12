@@ -81,13 +81,12 @@ const createProduct = async(req, res, next) => {
   const randomName = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
   const filename = randomName + path.extname(uploadedFile.name);
 
-  const uploadDirectory = path.join(__dirname, '../image'); 
 
   if (!fs.existsSync(uploadDirectory)) {
     fs.mkdirSync(uploadDirectory, { recursive: true });
   }
 
-  const filePath = path.join(uploadDirectory, filename);
+  const filePath = path.join("./src/image", filename);
   uploadedFile.mv(filePath, (err) => {
     if (err) {
       console.error('Error moving file:', err);
