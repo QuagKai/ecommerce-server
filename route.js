@@ -47,29 +47,11 @@ router.post('/upload', async (req, res) => {
     res.json(response);
 })
 
-app.use('/images', express.static(path.join(__dirname, 'images')));
-
 router.post('/update-product', async (req, res) => {
     const response = await updateProduct(req);
 
     res.json(response);
 })
-
-app.get('/display/:filename', (req, res) => {
-  const filename = req.params.filename;
-  const filePath = path.join(__dirname, 'public', filename);
-
-  fs.readFile(filePath, (err, data) => {
-    if (err) {
-      console.error(err);
-      return res.status(500).send('Error reading the file');
-    }
-
-    // Assuming the file is an image, set the appropriate content type
-    res.setHeader('Content-Type', 'image/jpeg'); // Adjust content type as needed
-    res.send(data);
-  });
-});
 
 router.delete('/product', async (req, res) => {
     const response = await deleteProduct(req);
@@ -149,5 +131,7 @@ router.get('/me', verifyToken, (req, res) => {
 // router.get('/browsing/product/:id', showAProduct, (req, res) => {
 //     console.log("browsing a product route end")
 // })
+
+router.use('/images', express.static('./src/image'));
 
 module.exports = router
