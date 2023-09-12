@@ -4,9 +4,13 @@ const { searchProduct} = require('./src/controller/productController')
 const jwt = require('jsonwebtoken');
 
 const express = require('express');
+const { showSellerProducts, showAProduct, createProduct, updateProduct, deleteProduct } = require('./src/controller/productController');
+const { findAttriCategory, loadAllCategories, getCategories } = require('./src/controller/categoryController');
+const { showSellerOrder, setSellerOrderStatus } = require('./src/controller/orderController');
 const { showAllProducts, showAProduct, addToCart, createProduct, updateProduct, deleteProduct } = require('./src/controller/productController');
 const { findAttriCategory, loadAllCategories } = require('./src/controller/categoryController');
 const router = express.Router();
+
 router.use(express.json());
 
 function verifyToken(req, res, next) {
@@ -33,31 +37,14 @@ router.get('/homepage', (req, res) => {
     res.send('This is a homepage');
 })
 
+//category controller 
+router.get('/category', async (req, res) => {
+  const response = await getCategories(req);
+
+  res.send(response);
+})
 //All routes for product management
-router.post('/product', async (req, res) => {
-    const response = await showAllProducts(req);
 
-    res.json(response);
-})
-
-router.post('/upload', async (req, res) => {
-  console.log(req)
-    const response = await createProduct(req);
-
-    res.json(response);
-})
-
-router.post('/update-product', async (req, res) => {
-    const response = await updateProduct(req);
-
-    res.json(response);
-})
-
-router.delete('/product', async (req, res) => {
-    const response = await deleteProduct(req);
-
-    res.json(response);
-})
 
 // router.get('/manager/product/create?category=$name', createProduct, findAttriCategory, (req, res) => {
 //     console.log('createProduct route end');
@@ -112,6 +99,43 @@ router.post('/login/seller', async (req, res) => {
 
     res.send(response);
 })
+
+router.post('/seller/order', async (req, res) => {
+    const response = await showSellerOrder(req);
+
+    res.send(response);
+})
+
+router.put('/seller/order', async (req, res) => {
+  const response = await setSellerOrderStatus(req);
+
+  res.json(response);
+})
+
+router.post('/seller/product', async (req, res) => {
+  console.log(req)
+  const response = await showSellerProducts(req);
+
+  res.json(response);
+})
+
+router.post('/seller/upload', async (req, res) => {
+console.log(req)
+  const response = await createProduct(req);
+
+  res.json(response);
+})
+
+router.post('/seller/update-product', async (req, res) => {
+  const response = await updateProduct(req);
+
+  res.json(response);
+})
+
+router.delete('/seller/product', async (req, res) => {
+  const response = await deleteProduct(req);
+
+  res.json(response);
 
 router.get('/browsing/all', async (req, res) => {
     const response = await showAllProducts();

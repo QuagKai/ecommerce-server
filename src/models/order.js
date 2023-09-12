@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 const Carts = require('./cart');
 const Products = require('./product');
-const Customers = require('./customer');
 
 const orderSchema = new mongoose.Schema({    
     created_by: {
@@ -34,11 +33,10 @@ const orderSchema = new mongoose.Schema({
     statusUpdate: {
         productStatus: {
             type: String,
-            enum: ['Shipped', 'Cancelled']
+            default: 'New'
         },
         customerDecision: {
             type: String,
-            enum: ['Accepted', 'Rejected']
         }
     }
 })

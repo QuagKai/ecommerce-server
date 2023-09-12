@@ -8,10 +8,7 @@ const sampleProducts = [
     {
       sellerId: '64fd38efa592ed3f1c3468ae',
       name: 'Product 1',
-      imgURl: {
-        data: Buffer.from('Sample Image Data 1'),
-        contentType: 'image/jpeg',
-      },
+      imgURl: 'a9g2wzp5enkeol2id2pzl.png',
       descrip: 'Description for Product 1',
       brand: 'Brand 1',
       cost: 100.99,
@@ -20,10 +17,7 @@ const sampleProducts = [
     {
       sellerId: '609c0e964b0ee32bcc29f31b',
       name: 'Product 2',
-      imgURl: {
-        data: Buffer.from('Sample Image Data 2'),
-        contentType: 'image/png',
-      },
+      imgURl: 'a9g2wzp5enkeol2id2pzl.png',
       descrip: 'Description for Product 2',
       brand: 'Brand 2',
       cost: 200.49,
@@ -32,33 +26,18 @@ const sampleProducts = [
     // Add more sample products as needed
   ];
   
-  // Insert the sample products into the database
-  async function insertSampleProducts() {
-    try {
-      // Loop through the sample products and create documents
-      for (const productData of sampleProducts) {
-        const product = new Product(productData);
-        await product.save(); // Save each product document to the database
-      }
-  
-      console.log('Sample products inserted successfully');
-    } catch (error) {
-      console.error('Error inserting sample products:', error);
-    }
-  }
-  
-  // Call the function to insert the sample products
+  //insert data
+  const insertSampleProducts = async () => {
+    await Product.insertMany(sampleProducts);
+
+    console.log('Sample products inserted');
+  };
+
   insertSampleProducts();
 
-const showAllProducts = () => {
-    return Product.find()
-    .then((p) => {
-        return p
-    })
-    .catch((err)=> console.log('Find in products colletion failed'))
-  
-const showAllProducts = async(req, res, next) => {
-   try {
+
+const showSellerProducts = async(req, res, next) => {
+    try {
         const id = req.body.userId;
         const products = await Product.find({ sellerId: id });
 
@@ -67,6 +46,14 @@ const showAllProducts = async(req, res, next) => {
          console.log("Failed to show all products");
          throw error
     }
+}
+const showAllProducts = () => {
+    return Product.find()
+    .then((p) => {
+        return p
+    })
+    .catch((err)=> console.log('Find in products colletion failed'))
+  
 }
 
 const showAProduct = async(id) => {
@@ -115,11 +102,6 @@ const createProduct = async(req, res, next) => {
 
   const randomName = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
   const filename = randomName + path.extname(uploadedFile.name);
-
-
-  if (!fs.existsSync(uploadDirectory)) {
-    fs.mkdirSync(uploadDirectory, { recursive: true });
-  }
 
   const filePath = path.join("./src/image", filename);
   uploadedFile.mv(filePath, (err) => {
@@ -188,5 +170,6 @@ const searchProduct = async (request) => {
     return results
 }
 
-module.exports = { showAllProducts, showAProduct, addToCart, createProduct, updateProduct, deleteProduct, searchProduct }
+module.exports = { showSellerProducts,showAllProducts, showAProduct, 
+                  addToCart, createProduct, updateProduct, deleteProduct, searchProduct }
 
