@@ -1,4 +1,5 @@
 const Product = require('../models/product');
+const Carts = require('../models/cart');
 const { findAttriCategory } = require('./categoryController');
 const path = require('path');
 const fs = require('fs');
@@ -31,85 +32,120 @@ const sampleProducts = [
     // Add more sample products as needed
   ];
   
-  // Insert the sample products into the database
-  async function insertSampleProducts() {
+// Insert the sample products into the database
+async function insertSampleProducts() {
     try {
-      // Loop through the sample products and create documents
-      for (const productData of sampleProducts) {
+        // Loop through the sample products and create documents
+        for (const productData of sampleProducts) {
         const product = new Product(productData);
         await product.save(); // Save each product document to the database
-      }
-  
-      console.log('Sample products inserted successfully');
+        }
+
+        console.log('Sample products inserted successfully');
     } catch (error) {
-      console.error('Error inserting sample products:', error);
-    }
-  }
-  
-  // Call the function to insert the sample products
-  insertSampleProducts();
-
-const showAllProducts = async(req, res, next) => {
-   try {
-        const id = req.body.userId;
-        const products = await Product.find({ sellerId: id });
-
-       return products;
-   } catch (error) {
-         console.log("Failed to show all products");
-         throw error
+        console.error('Error inserting sample products:', error);
     }
 }
 
-const showAProduct = async(req, res, next) => {
-    await Product.findById(req.params.id)
+// Call the function to insert the sample products
+insertSampleProducts();
+
+  const showAllProducts = () => {
+    return Product.find()
+    .then((p) => {
+        return p
+    })
+    .catch((err)=> console.log('Find in products colletion failed'))
+}
+
+const showSellerProducts = async(req, res, next) => {
+    try {
+         const id = req.body.userId;
+         const products = await Product.find({ sellerId: id });
+ 
+        return products;
+    } catch (error) {
+          console.log("Failed to show all products");
+          throw error
+     }
+}
+
+const showAProduct = async(id) => {
+    return Product.findById(id)
     .then((p) => {
         console.log("Found a product");
-        res.json(p)
+        return p
     })
     .catch((err) => {
         console.log("Failed to update");
         throw err
     })
-    next()
+}
+
+const addToCart =  async(pid, cid) => {
+    return await Carts.findOne({cartOwner: cid})
+    .then(async (cart) => {
+        if (cart && cart.items.length > 0) {
+            let dup = false;
+            for (let i = 0; i < cart.items.length; i++) {
+                if (cart.items[i].product == pid) {
+                    cart.items[i].quantity += 1
+                    dup = true
+                    console.log("Increase quantity by one")
+                    break
+                } 
+            }
+            if (dup == false) {
+                cart.items.push({product: pid, quantity: 1})
+                console.log("New item is pushed in existed cart")
+            }
+        } else {
+            await Carts.create({cartOwner: cid})
+            .then((cart) => {
+                cart.items.push({product: pid, quantity: 1})
+            })
+            .catch((err) => console.log("Cannot create a create and pust items: " + err))
+        }
+    })
+    .catch((err) => console.log("addToCart function error: " + err))
 }
 
 const createProduct = async(req, res, next) => {
-  const uploadedFile = req.files.image;
-  const { name, descrip, brand, cost, category_att } = req.body;
-
-  const randomName = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-  const filename = randomName + path.extname(uploadedFile.name);
-
-
-  if (!fs.existsSync(uploadDirectory)) {
-    fs.mkdirSync(uploadDirectory, { recursive: true });
+    const uploadedFile = req.files.image;
+    const { name, descrip, brand, cost, category_att } = req.body;
+  
+    const randomName = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+    const filename = randomName + path.extname(uploadedFile.name);
+  
+  
+    if (!fs.existsSync(uploadDirectory)) {
+      fs.mkdirSync(uploadDirectory, { recursive: true });
+    }
+  
+    const filePath = path.join("./src/image", filename);
+    uploadedFile.mv(filePath, (err) => {
+      if (err) {
+        console.error('Error moving file:', err);
+        return { error: 'An error occurred while moving the file.' }
+      }
+  
+     return { message: 'File uploaded and stored successfully!' };
+    });
+  
+    const product = new Product({
+      sellerId: req.body.userId,
+      name,
+      imgURl: filePath,
+      descrip,
+      brand,
+      cost,
+      category_att,
+    });
+  
+    await product.save();
   }
 
-  const filePath = path.join("./src/image", filename);
-  uploadedFile.mv(filePath, (err) => {
-    if (err) {
-      console.error('Error moving file:', err);
-      return { error: 'An error occurred while moving the file.' }
-    }
-
-   return { message: 'File uploaded and stored successfully!' };
-  });
-
-  const product = new Product({
-    sellerId: req.body.userId,
-    name,
-    imgURl: filePath,
-    descrip,
-    brand,
-    cost,
-    category_att,
-  });
-
-  await product.save();
-}
-
-const updateProduct = async(req, res, next) => {
+  const updateProduct = async(req, res, next) => {
     try {
         const { _id, name, imgURl, descrip, brand, cost, category_att } = req.body;
 
@@ -153,5 +189,4 @@ const searchProduct = async (request) => {
     return results
 }
 
-module.exports = { showAllProducts, searchProduct, updateProduct, deleteProduct, createProduct }
-
+module.exports = { showAllProducts, showAProduct, addToCart, createProduct, updateProduct, deleteProduct, searchProduct }
