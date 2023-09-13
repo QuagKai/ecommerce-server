@@ -33,7 +33,7 @@ const sampleProducts = [
     console.log('Sample products inserted');
   };
 
-  insertSampleProducts();
+//   insertSampleProducts();
 
 
 const showSellerProducts = async(req, res, next) => {
@@ -69,31 +69,89 @@ const showAProduct = async(id) => {
 }
 
 const addToCart =  async(pid, cid) => {
-    return await Carts.findOne({cartOwner: cid})
-    .then(async (cart) => {
-        if (cart && cart.items.length > 0) {
-            let dup = false;
-            for (let i = 0; i < cart.items.length; i++) {
-                if (cart.items[i].product == pid) {
-                    cart.items[i].quantity += 1
-                    dup = true
-                    console.log("Increase quantity by one")
-                    break
-                } 
-            }
-            if (dup == false) {
-                cart.items.push({product: pid, quantity: 1})
-                console.log("New item is pushed in existed cart")
-            }
-        } else {
-            await Carts.create({cartOwner: cid})
-            .then((cart) => {
-                cart.items.push({product: pid, quantity: 1})
-            })
-            .catch((err) => console.log("Cannot create a create and pust items: " + err))
+    try{
+        let cart = await Carts.findOne({cartOwner: cid})
+        if (!cart) {
+            // If the cart doesn't exist, create a new one
+            cart = await Carts.create({ cartOwner: cid , item:[], qty: 0, totalCost: 0});
         }
-    })
-    .catch((err) => console.log("addToCart function error: " + err))
+        const existingItem = cart.items.find(item => item.product == pid);
+
+        if (existingItem) {
+            existingItem.quantity += 1;
+            const cost = await Product.findById(pid)
+            .then((res) => {
+                console.log('Found a product for adding')
+                return res.cost
+            }).catch((err) => console.log('Cant find a product for adding'))
+            cart.totalCost += cost
+            cart.qty += 1
+        } else {
+            cart.items.push({ product: pid, quantity: 1 });
+            const cost = await Product.findById(pid)
+            .then((res) => {
+                console.log('Found a new product for adding')
+                return res.cost
+            }).catch((err) => console.log('Cant find a new product for adding'))
+            cart.qty += 1
+            cart.totalCost += cost
+        }
+        await cart.save()
+        .then(() => console.log("addToCart successful"))
+        .catch((err) => console.log("Failed to save cart"))
+
+        return cart;
+    } catch (error) {
+        console.log("addToCart function error:", error);
+        throw error;
+    }
+}
+
+const displayCart = async(cid) => {
+    try {
+        let cart = await Carts.findOne({cartOwner: cid})
+        if (!cart) {
+            // If the cart doesn't exist, create a new one
+            cart = await Carts.create({ cartOwner: cid , item:[], qty: 0, totalCost: 0 });
+            await cart.save()
+            .then(() => console.log("Create a new cart successful"))
+            .catch((err) => console.log("Failed to create a new cart"))
+        }
+        let cartInfo = (await cart.populate('items.product'))
+        return cartInfo
+    } catch (err) {
+        console.log("displayCart function error: " + err)
+        throw err
+    }
+}
+
+const removeItemCart =  async(pid, cid) => {
+    try{
+        let cart = await Carts.findOne({cartOwner: cid})
+        if (!cart) {
+            cart = await Carts.create({ cartOwner: cid , item:[], qty: 0, totalCost: 0});
+        }
+        const existingItem = cart.items.find(item => item.product == pid);
+
+        if (existingItem) {
+            existingItem.quantity -= 1;
+            const cost = await Product.findById(pid)
+            .then((res) => {
+                console.log('Found a product for removing')
+                return res.cost
+            }).catch((err) => console.log('Cant find a product for removing'))
+            cart.totalCost -= cost
+            cart.qty -= 1
+        }
+        await cart.save()
+        .then(() => console.log("removeItemCart successful"))
+        .catch((err) => console.log("Failed to save cart"))
+
+        return cart;
+    } catch (error) {
+        console.log("removeItemCart function error:", error);
+        throw error;
+    }
 }
 
 const createProduct = async(req, res, next) => {
@@ -170,6 +228,16 @@ const searchProduct = async (request) => {
     return results
 }
 
-module.exports = { showSellerProducts,showAllProducts, showAProduct, 
-                  addToCart, createProduct, updateProduct, deleteProduct, searchProduct }
+module.exports = { 
+    showSellerProducts,
+    showAllProducts, 
+    showAProduct, 
+    addToCart, 
+    displayCart, 
+    createProduct, 
+    updateProduct, 
+    deleteProduct,
+    searchProduct,
+    removeItemCart, 
+}
 
