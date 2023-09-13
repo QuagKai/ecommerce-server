@@ -21,11 +21,10 @@ const insertSampleCategories = async () => {
     console.log('Sample categories inserted');
 };
 
-insertSampleCategories();
+// insertSampleCategories();
 
-const getCategories = async (req, res, next) => {
+const getCategories = async () => {
     const response = await Category.find()
-
     return response;
 }
 
