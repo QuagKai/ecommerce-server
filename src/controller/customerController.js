@@ -2,19 +2,12 @@ const Customer = require("../models/cutomer");
 const bcrypt = require("bcrypt");
 const jwt = require('jsonwebtoken');
 
-function generateRandomSecretKey(length) {
-    const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-    let secretKey = '';
-  
-    for (let i = 0; i < length; i++) {
-      const randomIndex = Math.floor(Math.random() * charset.length);
-      secretKey += charset[randomIndex];
-    }
-  
-    return secretKey;
-  }
-  
-  const secretKey = generateRandomSecretKey(32);
+const secretKey = process.env.SECRET_KEY;
+
+function generateToken(user) {
+  const payload = { userId: user.id, username: user.username };
+  return jwt.sign(payload, secretKey, { expiresIn: "1h" });
+}
 
 const customerRegister = async (req) => {
   try {
@@ -57,7 +50,7 @@ const customerLogin = async (req) => {
     const passwordMatch = await bcrypt.compare(password, user.password);
 
     if (passwordMatch) {
-      const token = jwt.sign({ userId: user._id }, secretKey, { expiresIn: '1h' });
+      const token = generateToken(user);
 
       return { message: 'Login successful', status: 200, token };
     } else {

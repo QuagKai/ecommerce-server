@@ -30,6 +30,14 @@ function verifyToken(req, res, next) {
   });
 }
 
+//get id
+router.get('/me', verifyToken, (req, res) => {
+  const userId = req.user.userId;
+  
+  res.json({ message: 'Access granted', userId });
+});
+
+
 router.get('/homepage', (req, res) => {
     res.send('This is a homepage');
 })
@@ -67,31 +75,7 @@ router.post('/delete-category', async (req, res) => {
 
   res.send(response);
 })
-//All routes for product management
 
-
-// router.get('/manager/product/create?category=$name', createProduct, findAttriCategory, (req, res) => {
-//     console.log('createProduct route end');
-// })
-
-// router.get('/manager/product/update?id=$id', updateProduct, (req, res) => {
-//     console.log("updateProduct route end");
-// })
-
-// router.get('/manager/product/delete?id=$id', deleteProduct, (req, res) => {
-//     console.log("deleteProduct route end");
-// })
-
-// router.get('/homepage', (req, res) => {
-//     res.send('This is a homepage')
-// })
-
-// router.get('/manager/showAllProducts', showAllProducts, (req, res) => {
-//     console.log('showProduct route end');
-
-// })
-
-//Route for customer
 router.put('/customer', async (req, res) => {
     const response = await customerRegister(req);
 
@@ -180,12 +164,6 @@ router.get('/browsing/all', async (req, res) => {
     console.log("browsing all route end")
 })
 
-//get id
-router.get('/me', verifyToken, (req, res) => {
-  const userId = req.user.userId;
-  
-  res.json({ message: 'Access granted', userId });
-});
 
 router.get('/browsing/product/:id', async (req, res) => {
     const response = await showAProduct(req.params.id);
@@ -199,17 +177,13 @@ router.get('/browsing/categories', async (req, res) => {
   console.log("Get category route end")
 })
 
-// router.all('/browsing/category', loadAllCategories, (req, res) => {
-//     console.log("loadingAllCategories route end")
-// })
-
 router.use('/images', express.static('./src/image'));
 
 router.post('/browsing/product/:id/addToCart/:userId', async (req, res) => {
   const { id, userId } = req.params;
   try {
     const updatedCart = await addToCart(id, userId);
-    res.json(updatedCart); // Send the updated cart back to the client
+    res.json(updatedCart);
     console.log('addToCart route end')
   } catch (error) {
     console.log("Error in addToCart route:", error);
@@ -220,7 +194,7 @@ router.post('/browsing/product/:id/removeItemCart/:userId', async (req, res) => 
   const { id, userId } = req.params;
   try {
     const updatedCart = await removeItemCart(id, userId);
-    res.json(updatedCart); // Send the updated cart back to the client
+    res.json(updatedCart); 
     console.log('removeItemCart route end')
   } catch (error) {
     console.log("Error in removeItemCart route:", error);
@@ -231,7 +205,6 @@ router.get('/customer/:userId/cart', async(req, res) => {
   const { userId } = req.params;
   try {
     const getDisplayCart = await displayCart(userId)
-    console.log(getDisplayCart);
     res.json(getDisplayCart);
     console.log('displayCart route end')
   } catch (err) {
