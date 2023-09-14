@@ -1,11 +1,10 @@
 const { customerRegister, customerLogin } = require('./src/controller/customerController')
 const { sellerRegister, sellerLogin } = require('./src/controller/sellerController')
-const { searchProduct} = require('./src/controller/productController')
 const jwt = require('jsonwebtoken');
 
 const express = require('express');
 const { showSellerOrder, setSellerOrderStatus } = require('./src/controller/orderController');
-const { showSellerProducts, showAllProducts, showAProduct, addToCart, createProduct, updateProduct, deleteProduct } = require('./src/controller/productController');
+const { showSellerProducts, showAllProducts, showAProduct, addToCart, displayCart, createProduct, updateProduct, deleteProduct, searchProduct, removeItemCart } = require('./src/controller/productController');
 const { findAttriCategory, loadAllCategories, getCategories } = require('./src/controller/categoryController');
 const router = express.Router();
 
@@ -163,6 +162,12 @@ router.get('/browsing/product/:id', async (req, res) => {
     console.log("browsing a product route end")
 })
 
+router.get('/browsing/categories', async (req, res) => {
+  const response = await getCategories();
+  res.send(response);
+  console.log("Get category route end")
+})
+
 // router.all('/browsing/category', loadAllCategories, (req, res) => {
 //     console.log("loadingAllCategories route end")
 // })
@@ -170,10 +175,39 @@ router.get('/browsing/product/:id', async (req, res) => {
 router.use('/images', express.static('./src/image'));
 
 router.post('/browsing/product/:id/addToCart/:userId', async (req, res) => {
-    const {id, userId} = req.params
-    const response = await addToCart(id, userId)
-    console.log(response);
-    console.log("addToCart route end")
+  const { id, userId } = req.params;
+  try {
+    const updatedCart = await addToCart(id, userId);
+    res.json(updatedCart); // Send the updated cart back to the client
+    console.log('addToCart route end')
+  } catch (error) {
+    console.log("Error in addToCart route:", error);
+  }
 })
+
+router.post('/browsing/product/:id/removeItemCart/:userId', async (req, res) => {
+  const { id, userId } = req.params;
+  try {
+    const updatedCart = await removeItemCart(id, userId);
+    res.json(updatedCart); // Send the updated cart back to the client
+    console.log('removeItemCart route end')
+  } catch (error) {
+    console.log("Error in removeItemCart route:", error);
+  }
+})
+
+router.get('/customer/:userId/cart', async(req, res) => {
+  const { userId } = req.params;
+  try {
+    const getDisplayCart = await displayCart(userId)
+    console.log(getDisplayCart);
+    res.json(getDisplayCart);
+    console.log('displayCart route end')
+  } catch (err) {
+    console.log('Error in displayCart route', err)
+  }
+})
+
+
 
 module.exports = router

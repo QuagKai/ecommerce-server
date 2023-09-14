@@ -26,7 +26,7 @@ const insertSampleOrders = async () => {
     console.log('Sample orders inserted');
 };
 
-insertSampleOrders();
+// insertSampleOrders();
 
 const findSellerId = async (id) => {
    const sellerId = Order.findById('yourOrderId')
