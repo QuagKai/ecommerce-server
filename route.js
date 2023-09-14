@@ -35,6 +35,14 @@ router.get('/homepage', (req, res) => {
     res.send('This is a homepage');
 })
 
+//router to display image
+router.get('/images/:id', (req, res) => {
+    const { id } = req.params;  
+    res.sendFile(__dirname + `/src/image/${id}`);
+})
+
+router.use('/images', express.static('./src/image'));
+
 //category controller 
 router.get('/category', async (req, res) => {
   const response = await getCategories(req);
