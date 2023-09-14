@@ -7,6 +7,7 @@ const fs = require('fs');
 const sampleProducts = [
     {
       sellerId: '64fd38efa592ed3f1c3468ae',
+      cateId: '6501aaae57b219094d873e04',
       name: 'Product 1',
       imgURl: 'a9g2wzp5enkeol2id2pzl.png',
       descrip: 'Description for Product 1',
@@ -16,6 +17,7 @@ const sampleProducts = [
     },
     {
       sellerId: '609c0e964b0ee32bcc29f31b',
+      cateId: '6501aaae57b219094d873e05',
       name: 'Product 2',
       imgURl: 'a9g2wzp5enkeol2id2pzl.png',
       descrip: 'Description for Product 2',
