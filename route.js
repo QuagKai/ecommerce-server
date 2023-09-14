@@ -1,11 +1,11 @@
 const { customerRegister, customerLogin } = require('./src/controller/customerController')
-const { sellerRegister, sellerLogin } = require('./src/controller/sellerController')
+const { sellerRegister, sellerLogin, getAllSeller, changeStatus } = require('./src/controller/sellerController')
 const jwt = require('jsonwebtoken');
 
 const express = require('express');
 const { showSellerOrder, setSellerOrderStatus } = require('./src/controller/orderController');
 const { showSellerProducts, showAllProducts, showAProduct, addToCart, displayCart, createProduct, updateProduct, deleteProduct, searchProduct, removeItemCart } = require('./src/controller/productController');
-const { findAttriCategory, loadAllCategories, getCategories } = require('./src/controller/categoryController');
+const { findAttriCategory, loadAllCategories, getCategories, updateCategory, createCategory, deleteCategory } = require('./src/controller/categoryController');
 const router = express.Router();
 
 router.use(express.json());
@@ -45,6 +45,25 @@ router.use('/images', express.static('./src/image'));
 //category controller 
 router.get('/category', async (req, res) => {
   const response = await getCategories(req);
+
+  res.send(response);
+})
+
+router.post('/category', async (req, res) => {
+  const response = await createCategory(req);
+
+  res.send(response);
+})
+
+router.put('/category', async (req, res) => {
+  console.log('hello')
+  const response = await updateCategory(req);
+
+  res.send(response);
+})
+
+router.post('/delete-category', async (req, res) => {
+  const response = await deleteCategory(req);
 
   res.send(response);
 })
@@ -93,16 +112,28 @@ router.post('/search', async (req, res) => {
 //
 
 //Route for seller
-router.put('/seller', (req, res) => {
-    const response = sellerRegister(req);
+router.put('/seller', async (req, res) => {
+    const response = await sellerRegister(req);
 
     res.send(response);
+})
+
+router.get('/sellers', async (req, res) => {
+  const response = await getAllSeller(req);
+
+  res.send(response);
 })
 
 router.post('/login/seller', async (req, res) => {
     const response = await sellerLogin(req);
 
     res.send(response);
+})
+
+router.put('/seller/status', async (req, res) => {
+  const response = await changeStatus(req);
+
+  res.send(response);
 })
 
 router.post('/seller/order', async (req, res) => {

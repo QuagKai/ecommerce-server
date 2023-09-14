@@ -9,6 +9,17 @@ function generateToken(user) {
   return jwt.sign(payload, secretKey, { expiresIn: "1h" });
 }
 
+const changeStatus = async(req, res) => {
+  try {
+    const { id, status } = req.body;
+    const response = await Seller.findByIdAndUpdate(id, { status: status });
+    return response;
+  } catch (error) {
+    console.log(error);
+    return { error: "Accept failed" };
+  }
+}
+
 const sellerRegister = async (req) => {
   try {
     const { email, password, phone, businessName } = req.body;
@@ -53,7 +64,9 @@ const sellerLogin = async (req) => {
     const passwordMatch = await bcrypt.compare(password, user.password);
 
     if (passwordMatch) {
-      // const token = jwt.sign({ userId: user._id }, secretKey, { expiresIn: '1h' });
+      if (user.status === "Pending") {
+        return { error: "Seller is not accepted", status: 401 };
+      }
 
       const token = generateToken(user);
       return { message: "Login successful", status: 200, token };
@@ -66,4 +79,8 @@ const sellerLogin = async (req) => {
   }
 };
 
-module.exports = { sellerRegister, sellerLogin };
+const getAllSeller = async() => {
+  return await Seller.find();
+}
+
+module.exports = { sellerRegister, sellerLogin, getAllSeller, changeStatus };

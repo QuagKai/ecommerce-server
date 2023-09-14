@@ -12,7 +12,7 @@ const categorySchema = new mongoose.Schema({
     },
     attCate:{
         type: String,
-        default: []
+        default: '[]'
     },
 })
 
