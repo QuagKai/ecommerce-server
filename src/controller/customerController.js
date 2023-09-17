@@ -30,6 +30,19 @@ const customerRegister = async (req) => {
   }
 };
 
+const getCustomerInfo = async (req) => {
+  try {
+    const userId = req.body.userId;
+    console.log(userId)
+    const customer = await Customer.findById(userId);
+    console.log(customer)
+    return customer;
+  } catch (error) {
+    console.log(error);
+    return { error: "Get info failed" };
+  }
+}
+
 const customerLogin = async (req) => {
   try {
     const { emailOrPhone, password } = req.body;
@@ -62,4 +75,4 @@ const customerLogin = async (req) => {
   }
 };
 
-module.exports = { customerRegister, customerLogin };
+module.exports = { customerRegister, customerLogin, getCustomerInfo };

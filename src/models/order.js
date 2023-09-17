@@ -37,6 +37,7 @@ const orderSchema = new mongoose.Schema({
         },
         customerDecision: {
             type: String,
+            default: ""
         }
     }
 })

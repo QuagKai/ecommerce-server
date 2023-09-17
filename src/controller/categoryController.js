@@ -1,7 +1,6 @@
 const Category = require('../models/category');
 const Products = require('../models/product');
 const path = require('path');
-//create category sample data
 
 const sampleCategories = [
     {
@@ -14,7 +13,6 @@ const sampleCategories = [
         imgURL: 'a9g2wzp5enkeol2id2pzl.png',
         attCate: 'Attribute 2',
     },
-    // Add more sample categories as needed
 ];
 
 const insertSampleCategories = async () => {
@@ -22,8 +20,6 @@ const insertSampleCategories = async () => {
 
     console.log('Sample categories inserted');
 };
-
-// insertSampleCategories();
 
 const getCategories = async () => {
     const response = await Category.find()
@@ -49,16 +45,16 @@ const updateCategory = async (req, res, next) => {
 
 const deleteCategory = async (req, res, next) => {
     const { _id } = req.body;
-    const checked = false;
-
+    let checked = false;
     const response = await Products.find({category: _id})
     .then((p) => {
         if(p.length > 0){
             console.log("There are some products in this category");
-            return false;
+             checked = false;
+            return res.json({message: "There are some products in this category"});
         }
         else{
-            checked = true;
+             checked = true;
             return true;
         }
     })
@@ -79,31 +75,34 @@ const deleteCategory = async (req, res, next) => {
 }
 
 const createCategory = async (req, res, next) => {
-    const uploadedFile = req.files.image;
     const { name,  attCate } = req.body;
-  
-    const randomName = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-    const filename = randomName + path.extname(uploadedFile.name);
-  
-    const filePath = path.join("./src/image", filename);
-    uploadedFile.mv(filePath, (err) => {
-      if (err) {
-        console.error('Error moving file:', err);
-        return { error: 'An error occurred while moving the file.' }
-      }
-  
-     return { message: 'File uploaded and stored successfully!' };
-    });
 
     const category = new Category({
         name,
-        imgURL: filePath,
         attCate: attCate,
     });
 
     await category.save();
 }
 
+const checkCategory = async (req, res, next) => {
+    const { _id } = req.body;
+
+    const response = await Category.findById(_id)
+    .then((cat) => {
+        if(cat.attCate !== null){
+            return true;
+        }
+        else{
+            return false;
+        }
+    })
+    .catch((err) => {
+        console.log("Error in check category");
+        throw err
+    })
+    return response;
+}
 
 const findAttriCategory = async (req, res, next) => {
     await Category.findOne({name: req.params.name})
@@ -141,4 +140,9 @@ const findProductOfCategory = async(req, res, next) => {
     next();
 }
 
-module.exports = { findAttriCategory, loadAllCategories, getCategories, updateCategory, createCategory, findProductOfCategory, deleteCategory }
+const getCateName = async (req, res, next) => {
+    const response = await Category.findOne({_id: req.body.id})
+    
+    return response
+}
+module.exports = { findAttriCategory, loadAllCategories, getCategories, updateCategory, createCategory, findProductOfCategory, deleteCategory, checkCategory, getCateName }

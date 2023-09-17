@@ -4,40 +4,6 @@ const { findAttriCategory } = require('./categoryController');
 const path = require('path');
 const fs = require('fs');
 
-const sampleProducts = [
-    {
-      sellerId: '64fd38efa592ed3f1c3468ae',
-      cateId: '6501aaae57b219094d873e04',
-      name: 'Product 1',
-      imgURl: 'a9g2wzp5enkeol2id2pzl.png',
-      descrip: 'Description for Product 1',
-      brand: 'Brand 1',
-      cost: 100.99,
-      category_att: 'Category 1',
-    },
-    {
-      sellerId: '609c0e964b0ee32bcc29f31b',
-      cateId: '6501aaae57b219094d873e05',
-      name: 'Product 2',
-      imgURl: 'a9g2wzp5enkeol2id2pzl.png',
-      descrip: 'Description for Product 2',
-      brand: 'Brand 2',
-      cost: 200.49,
-      category_att: 'Category 2',
-    },
-    // Add more sample products as needed
-  ];
-  
-  //insert data
-  const insertSampleProducts = async () => {
-    await Product.insertMany(sampleProducts);
-
-    console.log('Sample products inserted');
-  };
-
-//   insertSampleProducts();
-
-
 const showSellerProducts = async(req, res, next) => {
     try {
         const id = req.body.userId;
@@ -74,7 +40,6 @@ const addToCart =  async(pid, cid) => {
     try{
         let cart = await Carts.findOne({cartOwner: cid})
         if (!cart) {
-            // If the cart doesn't exist, create a new one
             cart = await Carts.create({ cartOwner: cid , item:[], qty: 0, totalCost: 0});
         }
         const existingItem = cart.items.find(item => item.product == pid);
@@ -158,7 +123,8 @@ const removeItemCart =  async(pid, cid) => {
 
 const createProduct = async(req, res, next) => {
   const uploadedFile = req.files.image;
-  const { name, descrip, brand, cost, category_att } = req.body;
+  const { name, descrip, brand, cost, category, userId, attribute } = req.body;
+  console.log(req.body)
 
   const randomName = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
   const filename = randomName + path.extname(uploadedFile.name);
@@ -176,11 +142,12 @@ const createProduct = async(req, res, next) => {
   const product = new Product({
     sellerId: req.body.userId,
     name,
-    imgURl: filePath,
+    imgURl: filename,
     descrip,
     brand,
     cost,
-    category_att,
+    cateId: category,
+    category_att: attribute,
   });
 
   await product.save();
@@ -222,13 +189,23 @@ const searchProduct = async (request) => {
     
     const results = await Product.find({
         $or: [
-          { name: { $regex: search, $options: 'i' } }, // Case-insensitive search in 'name' field
-          { description: { $regex: search, $options: 'i' } }, // Case-insensitive search in 'description' field
+          { name: { $regex: search, $options: 'i' } }, 
+          { description: { $regex: search, $options: 'i' } }, 
         ],
       });
 
     return results
 }
+
+// const groupProductBySellerId = async (request) => {
+//     const product = request.body;
+//     for (let i = 0; i < product.length; i++) {
+//         const products = await Product.findById(product[i].productId).select
+//         return products;
+//     }
+//     const products = await Product.find({ sellerId: sellerId })
+//       return products;
+// }
 
 module.exports = { 
     showSellerProducts,

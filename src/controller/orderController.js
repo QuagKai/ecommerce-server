@@ -2,7 +2,6 @@ const Order = require('../models/order');
 const Product = require('../models/product');
 const Cart = require('../models/cart');
 
-//create sample order
 const sampleOrders = [
     {
         created_by: '609c0e964b0ee32bcc29f31b',
@@ -42,35 +41,58 @@ const setSellerOrderStatus = async (request) => {
     Order.findByIdAndUpdate(
         orderId,
         { 'statusUpdate.productStatus': status },
-        { new: true } // To return the updated document
+        { new: true }
       )
         .then((updatedOrder) => {
           if (updatedOrder) {
-            // The 'updatedOrder' contains the updated document
             console.log(updatedOrder);
           } else {
             console.log('Order not found');
           }
         })
         .catch((err) => {
-          // Handle any errors that may occur during the update operation
           console.error(err);
         });
 }
 
-//get all orders of a seller
+
 const showSellerOrder = async (request) => {
     const sellerId = request.body.userId;
     const orders = await Order.find({ sellerId: sellerId })
       .populate({
         path: 'items.product',
-        select: 'name', // Specify the field(s) you want from the Product collection
+        select: 'name',
       }).populate({
         path: 'created_by',
         select: 'email',
         });
+      return orders;
+}
+
+const showCustomerOrder = async (request) => {
+    const userId = request.body.userId;
+    const orders = await Order.find({ created_by: userId});
 
       return orders;
 }
 
-module.exports = { showSellerOrder, setSellerOrderStatus }
+const updateOrderStatus = async (request) => {
+    const {orderId, status} = request.body;
+    console.log(orderId, status)
+    const order = await Order.findByIdAndUpdate(orderId, {'statusUpdate.customerDecision': status});
+
+    return order;
+}
+
+const createOrder = async (request) => {
+  const { userId, sellerId, address, items } = request.body;
+  const order = new Order({
+    created_by: userId,
+    sellerId,
+    address,
+    items,
+  });
+  await order.save();
+}
+
+module.exports = { showSellerOrder, setSellerOrderStatus, findSellerId, showCustomerOrder, updateOrderStatus, createOrder }

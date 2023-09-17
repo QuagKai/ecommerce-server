@@ -6,13 +6,9 @@ const categorySchema = new mongoose.Schema({
         type: String,
         require: true
     },
-    imgURL: {
-        data: Buffer,
-        contentType: String
-    },
     attCate:{
         type: String,
-        default: '[]'
+        default: ""
     },
 })
 

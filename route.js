@@ -1,11 +1,11 @@
-const { customerRegister, customerLogin } = require('./src/controller/customerController')
+const { customerRegister, customerLogin, getCustomerInfo } = require('./src/controller/customerController')
 const { sellerRegister, sellerLogin, getAllSeller, changeStatus } = require('./src/controller/sellerController')
 const jwt = require('jsonwebtoken');
 
 const express = require('express');
-const { showSellerOrder, setSellerOrderStatus } = require('./src/controller/orderController');
+const { showSellerOrder, setSellerOrderStatus, showCustomerOrder, updateOrderStatus, createOrder } = require('./src/controller/orderController');
 const { showSellerProducts, showAllProducts, showAProduct, addToCart, displayCart, createProduct, updateProduct, deleteProduct, searchProduct, removeItemCart } = require('./src/controller/productController');
-const { findAttriCategory, loadAllCategories, getCategories, updateCategory, createCategory, deleteCategory } = require('./src/controller/categoryController');
+const { findAttriCategory, loadAllCategories, getCategories, updateCategory, createCategory, deleteCategory, checkCategory, getCateName } = require('./src/controller/categoryController');
 const router = express.Router();
 
 router.use(express.json());
@@ -59,6 +59,12 @@ router.get('/category', async (req, res) => {
 
 router.post('/category', async (req, res) => {
   const response = await createCategory(req);
+
+  res.send(response);
+})
+
+router.post('/category-name', async (req, res) => {  
+  const response = await getCateName(req);
 
   res.send(response);
 })
@@ -177,6 +183,13 @@ router.get('/browsing/categories', async (req, res) => {
   console.log("Get category route end")
 })
 
+router.post('/check-category', async (req, res) => {
+  const response = await checkCategory(req);
+  res.send(response);
+  console.log("Check category route end")
+}
+)
+
 router.use('/images', express.static('./src/image'));
 
 router.post('/browsing/product/:id/addToCart/:userId', async (req, res) => {
@@ -212,6 +225,28 @@ router.get('/customer/:userId/cart', async(req, res) => {
   }
 })
 
+router.post('/customer/orders', async(req, res) => {
+  const response = await showCustomerOrder(req);
+  res.send(response);
+})
 
+router.put('/customer/orders', async(req, res) => {
+  const response = await updateOrderStatus(req);
+  res.send(response);
+})
 
-module.exports = router
+router.post('/customer/info', async(req, res) => {
+  const response = await getCustomerInfo(req);
+
+  res.send(response);
+
+})
+
+router.post('/customer/orders/create', async(req, res) => {
+  const response = await createOrder(req);
+
+  res.send(response);
+
+})
+
+module.exports = router;
